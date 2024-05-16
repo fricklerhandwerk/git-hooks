@@ -33,9 +33,9 @@ pkgs.mkShellNoCC {
 
 ## `lib.git-hooks.pre-commit`
 
-`pre-commit` takes a derivaton with a [pre-commit hook](https://git-scm.com/docs/githooks#_pre_commit), and returns a path to an executable that will install the hook.
-
     pre-commit :: Derivation -> Path
+
+`pre-commit` takes a derivaton with a [pre-commit hook](https://git-scm.com/docs/githooks#_pre_commit), and returns a path to an executable that will install the hook.
 
 The derivation must have `meta.mainProgram` set to the name of the executable in `$out/bin/` that implements the hook.
 The hook is installed in the Git repository that surrounds the working directory of the Nix invocation, and will get run roughly like this:
@@ -55,6 +55,39 @@ git stash pop
 >     pkgs.mkShellNoCC {
 >       shellHook = ''
 >         ${lib.git-hooks.pre-commit pkgs.hello}
+>       '';
+>     }
+>
+
+
+
+## `lib.git-hooks.wrap.abort-on-change`
+
+    abort-on-change :: Derivation -> Derivation
+
+Wrap a hook such that the commit is aborted if the hook changes staged files.
+
+> **Example**
+>
+> ### Wrap a pre-commit hook to abort on changed files
+>
+> The `cursed` hook will add an empty line to each staged file.
+> Wrapping it in `abort-on-change` will prevent files thus changed from being committed.
+>
+>     let
+>       cursed = pkgs.writeShellApplication {
+>         name = "pre-commit-hook";
+>         runtimeInputs = with pkgs; [ git ];
+>         text = ''
+>           for f in $(git diff --name-only --cached); do
+>             echo >> "$f"
+>           done
+>         '';
+>       };
+>     in
+>     pkgs.mkShellNoCC {
+>       shellHook = ''
+>         ${with lib.git-hooks; pre-commit (wrap.abort-on-change cursed)}
 >       '';
 >     }
 >
