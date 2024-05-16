@@ -2,6 +2,34 @@
   Install Nix packages as [Git hooks](https://git-scm.com/docs/githooks) from your Nix shell environment.
 
   Heavily inspired by [a hack](https://git.clan.lol/clan/clan-core/src/commit/930923512c03179fe75e4209c27eb3da368e7766/scripts/pre-commit) to get [treefmt](https://github.com/numtide/treefmt) into a pre-commit hook.
+
+  # Installation
+
+  ```shell-session
+  nix-shell -p npins
+  npins init
+  npins add github fricklerhandwerk git-hooks -b main
+  ```
+
+  ```nix
+  # default.nix
+  let
+    sources = import ./npins;
+  in
+  {
+    pkgs ? import sources.nixpkgs { inherit system; config = { }; overlays = [ ]; },
+    git-hooks ? import sources.git-hooks { inherit pkgs system; },
+    system ? builtins.currentSystem,
+  }:
+  let
+    inherit (git-hooks) lib;
+  in
+  pkgs.mkShellNoCC {
+    shellHook = ''
+      # add Git hooks here
+    '';
+  }
+  ```
 */
 { lib, writeShellApplication, git, busybox }:
 let
@@ -51,30 +79,11 @@ in
 
     :::{.example}
 
-    # Add a pre-commit hook to a development environment
+    # Add a pre-commit hook
 
     Entering this shell environment will install a Git hook that prints `Hello, world!` to the console before each commit:
 
-    ```shell-session
-    nix-shell -p npins
-    npins init
-    npins add github fricklerhandwerk git-hooks -b main
     ```
-
-    ```nix
-    # default.nix
-    let
-      sources = import ./npins;
-    in
-    {
-      nixpkgs ? sources.nixpkgs,
-      git-hooks ? sources.git-hooks,
-      system ? builtins.currentSystem,
-    }:
-    let
-      pkgs = import nixpkgs { inherit system; config = { }; overlays = [ ]; };
-      inherit (pkgs.callPackage git-hooks { inherit system nixpkgs; }) lib;
-    in
     pkgs.mkShellNoCC {
       shellHook = ''
         ${lib.git-hooks.pre-commit pkgs.hello}
