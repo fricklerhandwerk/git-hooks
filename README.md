@@ -5,13 +5,13 @@ Heavily inspired by [a hack](https://git.clan.lol/clan/clan-core/src/commit/9309
 
 ## Installation
 
-``` shell-session
+```shell-session
 nix-shell -p npins
 npins init
 npins add github fricklerhandwerk git-hooks -b main
 ```
 
-``` nix
+```nix
 # default.nix
 let
   sources = import ./npins;
@@ -40,7 +40,7 @@ pkgs.mkShellNoCC {
 The derivation must have `meta.mainProgram` set to the name of the executable in `$out/bin/` that implements the hook.
 The hook is installed in the Git repository that surrounds the working directory of the Nix invocation, and will get run roughly like this:
 
-``` bash
+```bash
 git stash push --keep-index
 hook
 git stash pop
