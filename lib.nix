@@ -31,7 +31,7 @@
   }
   ```
 */
-{ lib, writeShellApplication, git, busybox }:
+{ lib, writeShellApplication, git, stdenv, busybox, coreutils }:
 let
   wrap = hook: writeShellApplication
     {
@@ -54,7 +54,11 @@ let
     };
   install = hook: writeShellApplication {
     name = "install";
-    runtimeInputs = [ git busybox ];
+    runtimeInputs =
+      let
+        posix = if stdenv.isDarwin then coreutils else busybox;
+      in
+      [ git posix ];
     text = ''
       ln -s -f ${lib.getExe (wrap hook)} "$(git rev-parse --show-toplevel)"/.git/hooks/pre-commit
     '';

@@ -8,9 +8,9 @@
         "repo": "nixdoc-to-github"
       },
       "branch": "main",
-      "revision": "2a5826e460df7deb8618084fa3df1d1882e352d3",
-      "url": "https://github.com/fricklerhandwerk/nixdoc-to-github/archive/2a5826e460df7deb8618084fa3df1d1882e352d3.tar.gz",
-      "hash": "18dnhcdx661fs2x9gf9dwvsvyw7j2gximgikw3325g8v8cjrkgs0"
+      "revision": "f81742ef0603668d01e82f554852d642a3337f68",
+      "url": "https://github.com/fricklerhandwerk/nixdoc-to-github/archive/f81742ef0603668d01e82f554852d642a3337f68.tar.gz",
+      "hash": "14c1gmiq624r00nffrp0l34ypyydk2x0aqdibybr61nxyj2hx33q"
     },
     "nixpkgs": {
       "type": "Git",
