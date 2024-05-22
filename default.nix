@@ -2,7 +2,7 @@
   sources ? import ./npins,
   system ? builtins.currentSystem,
   pkgs ? import sources.nixpkgs { inherit system; config = { }; overlays = [ ]; },
-  nixdoc-to-github ? import sources.nixdoc-to-github { inherit pkgs system; },
+  nixdoc-to-github ? pkgs.callPackage sources.nixdoc-to-github { },
 }:
 let
   update-readme = lib.nixdoc-to-github.run {

@@ -18,7 +18,7 @@
   in
   {
     pkgs ? import sources.nixpkgs { inherit system; config = { }; overlays = [ ]; },
-    git-hooks ? import sources.git-hooks { inherit pkgs system; },
+    git-hooks ? pkgs.callPackage sources.git-hooks { },
     system ? builtins.currentSystem,
   }:
   let

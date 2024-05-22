@@ -12,13 +12,13 @@ npins add github fricklerhandwerk git-hooks -b main
 ```
 
 ```nix
-# default.nix
+## default.nix
 let
   sources = import ./npins;
 in
 {
   pkgs ? import sources.nixpkgs { inherit system; config = { }; overlays = [ ]; },
-  git-hooks ? import sources.git-hooks { inherit pkgs system; },
+  git-hooks ? pkgs.callPackage sources.git-hooks { },
   system ? builtins.currentSystem,
 }:
 let
@@ -26,14 +26,16 @@ let
 in
 pkgs.mkShellNoCC {
   shellHook = ''
-    # add Git hooks here
+#    # add Git hooks here
   '';
 }
 ```
 
 ## `lib.git-hooks.pre-commit`
 
-    pre-commit :: Derivation -> Path
+```
+pre-commit :: Derivation -> Path
+```
 
 `pre-commit` takes a derivaton with a [pre-commit hook](https://git-scm.com/docs/githooks#_pre_commit), and returns a path to an executable that will install the hook.
 
@@ -52,18 +54,19 @@ git stash pop
 >
 > Entering this shell environment will install a Git hook that prints `Hello, world!` to the console before each commit:
 >
->     pkgs.mkShellNoCC {
->       shellHook = ''
->         ${lib.git-hooks.pre-commit pkgs.hello}
->       '';
->     }
->
-
-
+> ```
+> pkgs.mkShellNoCC {
+>   shellHook = ''
+>     ${lib.git-hooks.pre-commit pkgs.hello}
+>   '';
+> }
+> ```
 
 ## `lib.git-hooks.wrap.abort-on-change`
 
-    abort-on-change :: Derivation -> Derivation
+```
+abort-on-change :: Derivation -> Derivation
+```
 
 Wrap a hook such that the commit is aborted if the hook changes staged files.
 
@@ -74,23 +77,22 @@ Wrap a hook such that the commit is aborted if the hook changes staged files.
 > The `cursed` hook will add an empty line to each staged file.
 > Wrapping it in `abort-on-change` will prevent files thus changed from being committed.
 >
->     let
->       cursed = pkgs.writeShellApplication {
->         name = "pre-commit-hook";
->         runtimeInputs = with pkgs; [ git ];
->         text = ''
->           for f in $(git diff --name-only --cached); do
->             echo >> "$f"
->           done
->         '';
->       };
->     in
->     pkgs.mkShellNoCC {
->       shellHook = ''
->         ${with lib.git-hooks; pre-commit (wrap.abort-on-change cursed)}
->       '';
->     }
->
-
-
+> ```
+> let
+>   cursed = pkgs.writeShellApplication {
+>     name = "pre-commit-hook";
+>     runtimeInputs = with pkgs; [ git ];
+>     text = ''
+>       for f in $(git diff --name-only --cached); do
+>         echo >> "$f"
+>       done
+>     '';
+>   };
+> in
+> pkgs.mkShellNoCC {
+>   shellHook = ''
+>     ${with lib.git-hooks; pre-commit (wrap.abort-on-change cursed)}
+>   '';
+> }
+> ```
 
