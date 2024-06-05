@@ -47,8 +47,13 @@ let
           git stash pop -q
           exit "$ret"
         }
-        git stash push --quiet --keep-index --message "pre-commit"
-        trap unstash EXIT
+
+        # check if there's an initial commit
+        if git rev-parse --verify HEAD >/dev/null 2>&1; then
+          git stash push --keep-index --message pre-commit > /dev/null
+          trap unstash EXIT
+        fi
+
         ${lib.getExe hook}
       '';
     };
